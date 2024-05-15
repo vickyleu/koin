@@ -3,22 +3,32 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
 }
 
-val androidCompileSDK : String by project
-val androidMinSDK : String by project
-
+kotlin {
+    jvmToolchain {
+        this.languageVersion.set(JavaLanguageVersion.of(libs.versions.jvmTarget.get()))
+    }
+}
 android {
-    compileSdk = androidCompileSDK.toInt()
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    namespace = "org.koin.android"
     defaultConfig {
-        minSdk = androidMinSDK.toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
     buildFeatures {
         buildConfig = false
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
+
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = libs.versions.jvmTarget.get()
     }
 }
 
@@ -39,10 +49,4 @@ dependencies {
     testImplementation(libs.test.mockk)
 }
 
-// android sources
-val sourcesJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
-    archiveClassifier.set("sources")
-    from(android.sourceSets.map { it.java.srcDirs })
-}
-
-apply(from = file("../../gradle/publish-android.gradle.kts"))
+//apply(from = file("../../gradle/publish-android.gradle.kts"))

@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -45,9 +46,9 @@ kotlin {
 }
 
 tasks.withType<KotlinCompile>().all {
-    kotlinOptions {
-        jvmTarget = "1.8"
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmTarget.get()))
     }
 }
 
-apply(from = file("../../gradle/publish.gradle.kts"))
+//apply(from = file("../../gradle/publish.gradle.kts"))

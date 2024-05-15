@@ -53,5 +53,5 @@ inline fun <reified T> _q() = TypeQualifier(T::class)
 
 val <E : Enum<E>> Enum<E>.qualifier
     get(): Qualifier {
-        return StringQualifier(this.toString().toLowerCase())
+        return StringQualifier(this.toString().lowercase())
     }

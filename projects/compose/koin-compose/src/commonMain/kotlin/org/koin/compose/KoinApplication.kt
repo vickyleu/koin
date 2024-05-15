@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("TYPEALIAS_EXPANSION_DEPRECATION")
+
 package org.koin.compose
 
 import androidx.compose.runtime.Composable

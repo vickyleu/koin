@@ -43,7 +43,7 @@ inline fun <reified T : Any> Module.single(
  * @param qualifier
  * @param override - allow definition override
  */
-@KoinReflectAPI
+@OptIn(KoinReflectAPI::class)
 @Deprecated("API is deprecated in favor of factoryOf DSL")
 inline fun <reified T : Any> Module.factory(
     qualifier: Qualifier? = null,

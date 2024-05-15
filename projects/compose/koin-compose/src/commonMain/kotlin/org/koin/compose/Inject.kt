@@ -63,6 +63,6 @@ inline fun <reified T> koinInject(
 )
 inline fun <reified T> rememberKoinInject(
     qualifier: Qualifier? = null,
-    scope: Scope = rememberCurrentKoinScope(),
+    scope: Scope = currentKoinScope(),
     noinline parameters: ParametersDefinition? = null,
 ): T = koinInject(qualifier, scope, parameters)

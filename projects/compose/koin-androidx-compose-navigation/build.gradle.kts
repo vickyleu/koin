@@ -3,23 +3,29 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.compose.compiler)
 }
 
-val androidCompileSDK : String by project
-val androidMinSDK : String by project
-val jetpackComposeCompiler : String by project
-
+kotlin {
+    jvmToolchain {
+        this.languageVersion.set(JavaLanguageVersion.of(libs.versions.jvmTarget.get()))
+    }
+}
+//compose {
+//    kotlinCompilerPlugin = "org.jetbrains.kotlin:kotlin-compose-compiler-plugin-embeddable:${libs.versions.kotlin.get()}"
+//}
 android {
-    compileSdk = androidCompileSDK.toInt()
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    namespace = "org.koin.androidx.compose.navigation"
     defaultConfig {
-        minSdk = androidMinSDK.toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
     buildFeatures {
         buildConfig = false
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = jetpackComposeCompiler
+        kotlinCompilerExtensionVersion = libs.versions.android.compose.compiler.get()
     }
 }
 
@@ -34,4 +40,4 @@ val sourcesJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
     from(android.sourceSets.map { it.java.srcDirs })
 }
 
-apply(from = file("../../gradle/publish-android.gradle.kts"))
+//apply(from = file("../../gradle/publish-android.gradle.kts"))

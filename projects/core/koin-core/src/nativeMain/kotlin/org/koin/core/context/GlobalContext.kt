@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("TYPEALIAS_EXPANSION_DEPRECATION")
+
 package org.koin.core.context
 
 import co.touchlab.stately.concurrency.Lock

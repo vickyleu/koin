@@ -1,36 +1,50 @@
 [versions]
 
 # /!\ Koin in gradle.properties /!\
-
+isUseForkConfig="true"
 # Core
-kotlin = "1.9.23"
+kotlin = "2.0.0-RC3"
 binaryValidator = "0.13.2"
 publish = "2.0.0-rc-1"
 coroutines = "1.8.0" # "1.8.0-RC2" for wasm
-dokka = "1.9.10"
+dokka = "1.9.20"
 # Android
-agp = "7.4.2"
+agp = "8.4.0"
+jvmTarget = "17"
+koinVersion="3.6.0-alpha3"
+koinComposeVersion = "1.2.0-alpha3"
+
+
+
+forkVersion="1.0.2"
+
+android-compileSdk = "34"
+android-minSdk = "24"
+android-targetSdk = "34"
+android-compose-compiler = "1.5.14"
+
+
 android-appcompat = "1.6.1"
 android-activity = "1.9.0"
-android-fragment = "1.7.0"
-androidx-viewmodel = "2.7.0"
-androidx-commonJava8 = "2.7.0"
+android-fragment = "1.7.1"
+androidx-viewmodel = "2.8.0"
+androidx-commonJava8 = "2.8.0"
 androidx-workmanager = "2.9.0"
 androidx-navigation = "2.7.7"
 # Compose
 # /!\ Compose compiler in gradle.properties /!\
 composeJB = "1.6.2"
 composeJetpackRuntime = "1.6.7"
-composeJetpackViewmodel = "2.7.0"
+composeJetpackViewmodel = "2.8.0"
 # Test
 stately = "2.0.6"
 junit = "4.13.2"
-jupiter = "5.9.3"
-mockito = "4.7.0"
-mockk = "1.13.2"
+jupiter = "5.10.0"
+mockito = "5.2.0"
+mockk = "1.13.8"
 # Ktor
 ktor = "2.3.10"
-slf4j = "1.7.36"
+slf4j = "2.0.13"
 
 [libraries]
 # Core
@@ -73,3 +87,4 @@ compose = { id = "org.jetbrains.compose", version.ref = "composeJB" }
 kotlinBinary = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binaryValidator" }
 nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "publish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

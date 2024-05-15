@@ -31,4 +31,4 @@ dependencies {
     }
 }
 
-apply(from = file("../../gradle/publish-pom.gradle.kts"))
+//apply(from = file("../../gradle/publish-pom.gradle.kts"))
