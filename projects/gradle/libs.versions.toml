@@ -33,7 +33,7 @@ androidx-workmanager = "2.9.0"
 androidx-navigation = "2.7.7"
 # Compose
 # /!\ Compose compiler in gradle.properties /!\
-composeJB = "1.6.2"
+composeJB = "1.6.10-rc03"
 composeJetpackRuntime = "1.6.7"
 composeJetpackViewmodel = "2.8.0"
 # Test

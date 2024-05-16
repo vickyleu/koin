@@ -115,7 +115,7 @@ allprojects {
                 }
             }
         }
-        var shouldRegistering = ""
+        var shouldRegistering = false
         val javadocJar by if (project.extensions.findByType(org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension::class) != null) {
             val kotlin =
                 project.extensions.getByType(org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension::class)
@@ -143,17 +143,14 @@ allprojects {
                 archiveClassifier = "javadoc"
             }
         } else if (project.extensions.findByName("javaPlatform") != null) {
-            shouldRegistering = "javaPlatform"
+            shouldRegistering = true
             tasks.registering(Jar::class) {
                 dependsOn(tasks.dokkaHtml)
                 from(tasks.dokkaHtml.flatMap(org.jetbrains.dokka.gradle.DokkaTask::outputDirectory))
                 archiveClassifier = "javaPlatform"
             }
         } else if (project.extensions.findByName("java") != null) {
-            shouldRegistering = "java"
-            println("不是最后一个啦:${project.name}" +
-                    " ${project.extensions.extensionsSchema.map { it.name }}"
-            )
+            shouldRegistering = true
             tasks.registering(Jar::class) {
                 dependsOn(tasks.dokkaHtml)
                 from(tasks.dokkaHtml.flatMap(org.jetbrains.dokka.gradle.DokkaTask::outputDirectory))
@@ -178,7 +175,7 @@ allprojects {
                     }
                 }
             }
-            if (shouldRegistering.isNotEmpty()) {
+            if (shouldRegistering) {
                 publications.register<MavenPublication>("java") {
                     artifact(javadocJar) // Required a workaround. See below
                     version = if (currentName.contains("compose")) mComposeVersion else mVersion
