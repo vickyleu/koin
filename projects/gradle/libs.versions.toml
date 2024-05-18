@@ -6,7 +6,7 @@ isUseForkConfig="true"
 kotlin = "2.0.0-RC3"
 binaryValidator = "0.13.2"
 publish = "2.0.0-rc-1"
-coroutines = "1.8.0" # "1.8.0-RC2" for wasm
+coroutines = "1.8.1" # "1.8.0-RC2" for wasm
 dokka = "1.9.20"
 # Android
 agp = "8.4.0"
