@@ -115,53 +115,10 @@ allprojects {
                 }
             }
         }
-        var shouldRegistering = false
-        val javadocJar by if (project.extensions.findByType(org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension::class) != null) {
-            val kotlin =
-                project.extensions.getByType(org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension::class)
-            kotlin.apply {
-                @OptIn(ExperimentalKotlinGradlePluginApi::class)
-                this.compilerOptions {
-                    freeCompilerArgs = listOf(
-                        "-Xexpect-actual-classes", // remove warnings for expect classes
-                        "-Xskip-prerelease-check",
-                        "-opt-in=kotlinx.cinterop.ExperimentalForeignApi",
-                    )
-                }
-                this.jvmToolchain {
-                    languageVersion.set(JavaLanguageVersion.of(jvmTarget.toInt()))
-                }
-                this.targets.withType<KotlinNativeTarget> {
-                    binaries.all {
-                        freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
-                    }
-                }
-            }
-            tasks.registering(Jar::class) {
-                dependsOn(tasks.dokkaHtml)
-                from(tasks.dokkaHtml.flatMap(org.jetbrains.dokka.gradle.DokkaTask::outputDirectory))
-                archiveClassifier = "javadoc"
-            }
-        } else if (project.extensions.findByName("javaPlatform") != null) {
-            shouldRegistering = true
-            tasks.registering(Jar::class) {
-                dependsOn(tasks.dokkaHtml)
-                from(tasks.dokkaHtml.flatMap(org.jetbrains.dokka.gradle.DokkaTask::outputDirectory))
-                archiveClassifier = "javaPlatform"
-            }
-        } else if (project.extensions.findByName("java") != null) {
-            shouldRegistering = true
-            tasks.registering(Jar::class) {
-                dependsOn(tasks.dokkaHtml)
-                from(tasks.dokkaHtml.flatMap(org.jetbrains.dokka.gradle.DokkaTask::outputDirectory))
-                archiveClassifier = "java"
-            }
-        } else {
-            tasks.registering(Jar::class) {
-                dependsOn(tasks.dokkaHtml)
-                from(tasks.dokkaHtml.flatMap(org.jetbrains.dokka.gradle.DokkaTask::outputDirectory))
-                archiveClassifier = "javadoc"
-            }
+        val javadocJar by tasks.registering(Jar::class) {
+            dependsOn(tasks.dokkaHtml)
+            from(tasks.dokkaHtml.flatMap(org.jetbrains.dokka.gradle.DokkaTask::outputDirectory))
+            archiveClassifier = "javadoc"
         }
         publishing {
             val projectName = rootProjectName
@@ -175,55 +132,74 @@ allprojects {
                     }
                 }
             }
+            val shouldRegistering = when{
+                project.extensions.findByName("javaPlatform")!=null->true
+                project.extensions.findByName("android")!=null->true
+//                project.extensions.findByName("java")!=null->true
+                else->false
+            }
             if (shouldRegistering) {
-                publications.register<MavenPublication>("java") {
-                    artifact(javadocJar) // Required a workaround. See below
-                    version = if (currentName.contains("compose")) mComposeVersion else mVersion
-                    groupId = mGroup
-                    if (artifactId.startsWith("${rootProjectName}-${currentName}")) {
-                        artifactId =
-                            artifactId.replace("${rootProjectName}-${currentName}", currentName)
-                    }
-                    println("artifactId: $artifactId")
-                    pom {
-                        url = "https://github.com/$mavenAuthor/${projectName}"
-                        name = projectName
-                        description = """
+                afterEvaluate {
+
+                    publications.register<MavenPublication>(
+                        if(project.extensions.findByName("android")!=null) "release" else "java")
+                    {
+
+                        when{
+                            project.extensions.findByName("javaPlatform")!=null->{
+                                from(components["javaPlatform"])
+                            }
+                            project.extensions.findByName("android")!=null->{
+                                from(components["release"])
+                            }
+                            else->Unit
+                        }
+                        version = if (currentName.contains("compose")) mComposeVersion else mVersion
+                        groupId = mGroup
+                        if (artifactId.startsWith("${rootProjectName}-${currentName}")) {
+                            artifactId =
+                                artifactId.replace("${rootProjectName}-${currentName}", currentName)
+                        }
+                        pom {
+                            url = "https://github.com/$mavenAuthor/${projectName}"
+                            name = projectName
+                            description = """
                 Visit the project on GitHub to learn more.
             """.trimIndent()
-                        inceptionYear = "2024"
-                        licenses {
-                            license {
-                                name = "Apache-2.0 License"
-                                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                            inceptionYear = "2024"
+                            licenses {
+                                license {
+                                    name = "Apache-2.0 License"
+                                    url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                                }
                             }
-                        }
-                        developers {
-                            developer {
-                                id = "arnaudgiuliani"
-                                name = "Arnaud Giuliani"
-                                email = "arnaud@kotzilla.io"
-                                roles = listOf("Mobile Developer")
-                                timezone = "GMT+8"
+                            developers {
+                                developer {
+                                    id = "arnaudgiuliani"
+                                    name = "Arnaud Giuliani"
+                                    email = "arnaud@kotzilla.io"
+                                    roles = listOf("Mobile Developer")
+                                    timezone = "GMT+8"
+                                }
                             }
-                        }
-                        contributors {
-                            // contributor {}
-                        }
-                        scm {
-                            tag = "HEAD"
-                            url = "https://github.com/$mavenAuthor/${projectName}"
-                            connection = "scm:git:github.com/$mavenAuthor/${projectName}.git"
-                            developerConnection =
-                                "scm:git:ssh://github.com/$mavenAuthor/${projectName}.git"
-                        }
-                        issueManagement {
-                            system = "GitHub"
-                            url = "https://github.com/$mavenAuthor/${projectName}/issues"
-                        }
-                        ciManagement {
-                            system = "GitHub Actions"
-                            url = "https://github.com/$mavenAuthor/${projectName}/actions"
+                            contributors {
+                                // contributor {}
+                            }
+                            scm {
+                                tag = "HEAD"
+                                url = "https://github.com/$mavenAuthor/${projectName}"
+                                connection = "scm:git:github.com/$mavenAuthor/${projectName}.git"
+                                developerConnection =
+                                    "scm:git:ssh://github.com/$mavenAuthor/${projectName}.git"
+                            }
+                            issueManagement {
+                                system = "GitHub"
+                                url = "https://github.com/$mavenAuthor/${projectName}/issues"
+                            }
+                            ciManagement {
+                                system = "GitHub Actions"
+                                url = "https://github.com/$mavenAuthor/${projectName}/actions"
+                            }
                         }
                     }
                 }
@@ -370,7 +346,7 @@ tasks.register("deletePackages") {
     description = "Delete all packages in the GitHub Packages registry"
 
 
-    val keyword = mavenGroup
+    val keyword = "com.vickyleu.koin.android"//mavenGroup
     val properties = Properties().apply {
         runCatching { rootProject.file("local.properties") }
             .getOrNull()
